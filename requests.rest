@@ -1,7 +1,7 @@
-DELETE http://localhost:3001/api/persons/2
+DELETE https://desolate-badlands-81227.herokuapp.com/api/persons/2
 
 ###
-POST http://localhost:3001/api/persons/ HTTP/1.1
+POST https://desolate-badlands-81227.herokuapp.com/api/persons/ HTTP/1.1
 content-type: application/json
 
 {

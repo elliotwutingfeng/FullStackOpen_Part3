@@ -18,6 +18,10 @@ let persons = [
   { id: 4, name: "Mary Poppendick", number: "39-23-6423122" },
 ];
 
+app.get("/", (request, response) => {
+  response.send("<h1>Hello World!</h1>");
+});
+
 // 3.1
 app.get("/api/persons", (request, response) => {
   response.json(persons);
