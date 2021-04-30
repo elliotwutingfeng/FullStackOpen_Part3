@@ -44,4 +44,6 @@ if (process.argv.length === 5) {
     });
     mongoose.connection.close();
   });
+} else {
+  mongoose.connection.close();
 }
