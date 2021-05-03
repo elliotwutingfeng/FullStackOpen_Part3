@@ -10,6 +10,7 @@ if (process.argv.length < 3) {
 
 // Connect to phonebook server
 const password = process.argv[2]
+
 const url = `mongodb+srv://fullstack:${password}@cluster0.24zl2.mongodb.net/phonebook?retryWrites=true`
 mongoose.connect(url, {
   useNewUrlParser: true,
