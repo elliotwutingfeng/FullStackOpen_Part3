@@ -15,11 +15,27 @@ content-type: application/json
 
 {
     "name": "Aaron Thoburn",
-    "number": "00"
+    "number": "08"
 }
+
+
+###
+GET http://localhost:3001/info HTTP/1.1
 
 ###
 GET http://localhost:3001/api/persons/ HTTP/1.1
 
 ###
+GET http://localhost:3001/api/persons/608f92b74b66a345323b0eb6 HTTP/1.1
+
+###
 DELETE http://localhost:3001/api/persons/608fb0199567ea84210674ba
+
+###
+PUT http://localhost:3001/api/persons/608f92b74b66a345323b0eb6 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Aaron Thoburn",
+    "number": "08"
+}

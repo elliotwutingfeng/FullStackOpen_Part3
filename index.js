@@ -15,13 +15,13 @@ app.use(
 )
 
 // 3.1 3.13
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   Person.find({}).then((result) => {
     response.json(result)
-  })
+  }).catch(error => next(error))
 })
 // 3.2
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.find({}).then((result) =>
     result.length
   ).then((number_of_persons) => {
@@ -29,7 +29,7 @@ app.get('/info', (request, response) => {
       `<div>Phonebook has info for ${number_of_persons} people</div>
       <div>${new Date()}</div>`
     )
-  })
+  }).catch(error => next(error))
 })
 // 3.3
 app.get('/api/persons/:id', (request, response, next) => {
@@ -46,7 +46,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 // 3.5
-app.post('/api/persons', async (request, response, next) => {
+app.post('/api/persons', async (request, response) => {
   // 3.6
   const body = request.body
   if (body.name === undefined) {
@@ -56,25 +56,10 @@ app.post('/api/persons', async (request, response, next) => {
     return response.status(400).send({ error: 'number is missing' })
   }
 
-  const existingPerson =  await Person.find({}).then((persons) => {
-    return persons.find((d) => d.name === body.name)
-  })
   const numberAlreadyExists =  await Person.find({}).then((persons) => {
     return persons.find((d) => d.number === body.number) !== undefined
   })
-  if(existingPerson !== undefined){
-    const person = {
-      name: body.name,
-      number: body.number,
-    }
-    Person.findByIdAndUpdate(existingPerson.id, person, { new: true })
-      .then(updatedPerson => {
-        response.json(updatedPerson)
-      })
-      .catch(error => next(error))
-
-  }
-  else if(numberAlreadyExists){
+  if(numberAlreadyExists){
     return response.status(400).send({ error: 'number must be unique' })
   }
   else{
@@ -87,10 +72,20 @@ app.post('/api/persons', async (request, response, next) => {
       response.json(savedPerson)
     })
   }
-
 })
 
-
+app.put('/api/persons/:id', async (request, response, next) => {
+  const body = request.body
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
