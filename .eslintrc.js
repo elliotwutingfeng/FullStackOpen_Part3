@@ -5,7 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: 'eslint:recommended',
+  extends: 'airbnb',
   parserOptions: {
     ecmaVersion: 12,
   },
@@ -19,5 +19,6 @@ module.exports = {
     'object-curly-spacing': ['error', 'always'],
     'arrow-spacing': ['error', { before: true, after: true }],
     'no-console': 0,
+    'no-underscore-dangle': ['error', { allow: ['_id', '__v'] }],
   },
 }

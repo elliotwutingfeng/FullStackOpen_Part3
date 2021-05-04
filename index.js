@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+
 const app = express()
 app.use(cors())
 app.use(express.static('build'))
@@ -11,7 +12,7 @@ const Person = require('./models/person')
 // 3.7 3.8
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(
-  morgan(':method :url :status :res[content-length] - :response-time ms :body')
+  morgan(':method :url :status :res[content-length] - :response-time ms :body'),
 )
 
 // 3.1 3.13
@@ -26,10 +27,10 @@ app.get('/api/persons', (request, response, next) => {
 app.get('/info', (request, response, next) => {
   Person.find({})
     .then((result) => result.length)
-    .then((number_of_persons) => {
+    .then((numberOfPersons) => {
       response.send(
-        `<div>Phonebook has info for ${number_of_persons} people</div>
-      <div>${new Date()}</div>`
+        `<div>Phonebook has info for ${numberOfPersons} people</div>
+      <div>${new Date()}</div>`,
       )
     })
     .catch((error) => next(error))
@@ -52,7 +53,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 // 3.5
 app.post('/api/persons', async (request, response, next) => {
   // 3.6
-  const body = request.body
+  const { body } = request
   if (body.name === undefined) {
     return response.status(400).send({ error: 'name is missing' })
   }
@@ -60,27 +61,27 @@ app.post('/api/persons', async (request, response, next) => {
     return response.status(400).send({ error: 'number is missing' })
   }
 
-  const numberAlreadyExists = await Person.find({}).then((persons) => {
-    return persons.find((d) => d.number === body.number) !== undefined
-  })
+  const numberAlreadyExists = await Person.find({})
+    .then((persons) => persons.find((d) => d.number === body.number) !== undefined)
   if (numberAlreadyExists) {
     return response.status(400).send({ error: 'number must be unique' })
-  } else {
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
-    person
-      .save()
-      .then((savedPerson) => {
-        response.json(savedPerson)
-      })
-      .catch((error) => next(error))
   }
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+  person
+    .save()
+    .then((savedPerson) => {
+      response.json(savedPerson)
+    })
+    .catch((error) => next(error))
+
+  return null
 })
 
 app.put('/api/persons/:id', async (request, response, next) => {
-  const body = request.body
+  const { body } = request
   const person = {
     name: body.name,
     number: body.number,
@@ -94,6 +95,8 @@ app.put('/api/persons/:id', async (request, response, next) => {
       response.json(updatedPerson)
     })
     .catch((error) => next(error))
+
+  return null
 })
 
 const unknownEndpoint = (request, response) => {
@@ -107,16 +110,18 @@ const errorHandler = (error, request, response, next) => {
   console.log(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
+  } if (error.name === 'ValidationError') {
     return response.status(409).json({ error: error.message })
   }
   next(error)
+
+  return null
 }
 
 // this has to be the last loaded middleware.
 app.use(errorHandler)
 
-const PORT = process.env.PORT
+const { PORT } = process.env
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
